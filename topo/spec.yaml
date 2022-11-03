@@ -98,6 +98,9 @@ node_configs:
       vtysh -c "conf t"
       -c "interface rt"
       -c " ip address 172.16.100.2/24"
+  - cmd: >-
+      vtysh -c "conf t"
+      -c "ip route 172.16.0.0/24 172.16.100.1"
 
 - name: CNS
   cmds:
@@ -109,3 +112,32 @@ node_configs:
       vtysh -c "conf t"
       -c "interface rt"
       -c " ip address 172.16.200.2/24"
+  - cmd: >-
+      vtysh -c "conf t"
+      -c "ip route 172.16.0.0/24 172.16.200.1"
+
+- name: Router
+  cmds:
+  - cmd: >-
+      vtysh -c "conf t"
+      -c "interface st"
+      -c " ip address 172.16.100.1/24"
+  - cmd: >-
+      vtysh -c "conf t"
+      -c "interface cns"
+      -c " ip address 172.16.200.1/24"
+  - cmd: >-
+      vtysh -c "conf t"
+      -c "interface sv"
+      -c " ip address 172.16.0.1/24"
+  - cmd: >-
+      vtysh -c "conf t"
+      -c "ip route 192.168.100.0/24 172.16.100.2"
+  - cmd: >-
+      vtysh -c "conf t"
+      -c "ip route 192.168.200.0/24 172.16.200.2"
+
+- name: Server
+  cmds:
+  - cmd: ip addr add 172.16.0.2/24 dev rt
+  - cmd: ip route add default via 172.16.0.1
