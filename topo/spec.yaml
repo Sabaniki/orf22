@@ -1,0 +1,111 @@
+nodes:
+- name: Client1
+  image: sabaniki/frr:latest
+  interfaces:
+  - { name: ap, type: direct, args: AP#cl1 }
+
+- name: Client2
+  image: sabaniki/frr:latest
+  interfaces:
+  - { name: ap, type: direct, args: AP#cl2 }
+
+- name: AP
+  image: slankdev/ovs
+  interfaces:
+  - { name: cl1, type: direct, args: Client1#ap }
+  - { name: cl2, type: direct, args: Client2#ap }
+  - { name: sw, type: direct, args: Switch#ap }
+
+- name: Switch
+  image: slankdev/ovs
+  interfaces:
+  - { name: rtter, type: direct, args: Rtter#sw }
+  - { name: ap, type: direct, args: AP#sw }
+  - { name: cns, type: direct, args: CNS#sw }
+  - { name: st, type: direct, args: Starlink#sw }
+
+- name: Rtter
+  image: sabaniki/frr:latest
+  interfaces:
+  - { name: sw, type: direct, args: Switch#rtter }
+
+- name: Starlink
+  image: sabaniki/frr:latest
+  interfaces:
+  - { name: sw, type: direct, args: Switch#st }
+  - { name: rt, type: direct, args: Router#st }
+
+- name: CNS
+  image: sabaniki/frr:latest
+  interfaces:
+  - { name: sw, type: direct, args: Switch#cns }
+  - { name: rt, type: direct, args: Router#cns }
+
+- name: Router
+  image: sabaniki/frr:latest
+  interfaces:
+  - { name: st, type: direct, args: Starlink#rt }
+  - { name: cns, type: direct, args: CNS#rt }
+  - { name: sv, type: direct, args: Server#rt }
+
+- name: Server
+  image: sabaniki/frr:latest
+  interfaces:
+  - { name: rt, type: direct, args: Router#sv }
+
+node_configs:
+- name: Client1
+  cmds:
+  - cmd: ip addr add 192.168.100.10/24 dev ap
+  - cmd: ip route add default via 192.168.100.1
+
+- name: Client2
+  cmds:
+  - cmd: ip addr add 192.168.200.10/24 dev ap
+  - cmd: ip route add default via 192.168.200.1
+
+- name: AP
+  cmds:
+    - cmd: ovs-vsctl add-br ovs0
+    - cmd: ovs-vsctl add-port ovs0 cl1
+    - cmd: ovs-vsctl add-port ovs0 cl2
+    - cmd: ovs-vsctl add-port ovs0 sw
+    - cmd: ovs-vsctl set port cl1 tag=100
+    - cmd: ovs-vsctl set port cl2 tag=200
+    - cmd: ovs-vsctl set port sw trunk=100,200
+    - cmd: ip link set ovs0 up
+
+- name: Switch
+  cmds:
+    - cmd: ovs-vsctl add-br ovs0
+    - cmd: ovs-vsctl add-port ovs0 st
+    - cmd: ovs-vsctl add-port ovs0 cns
+    - cmd: ovs-vsctl add-port ovs0 ap
+    - cmd: ovs-vsctl add-port ovs0 rtter
+    - cmd: ovs-vsctl set port st tag=100
+    - cmd: ovs-vsctl set port cns tag=200
+    - cmd: ovs-vsctl set port ap trunk=100,200
+    - cmd: ovs-vsctl -- set bridge ovs0 mirrors=@m -- --id=@ap get Port ap -- --id=@rtter get Port rtter -- --id=@m create Mirror name=mirror_to_rtter select-dst-port=@ap select-src-port=@ap output-port=@rtter
+    - cmd: ip link set ovs0 up
+
+- name: Starlink
+  cmds:
+  - cmd: >-
+      vtysh -c "conf t"
+      -c "interface sw"
+      -c " ip address 192.168.100.1/24"
+  - cmd: >-
+      vtysh -c "conf t"
+      -c "interface rt"
+      -c " ip address 172.16.100.2/24"
+
+- name: CNS
+  cmds:
+  - cmd: >-
+      vtysh -c "conf t"
+      -c "interface sw"
+      -c " ip address 192.168.200.1/24"
+  - cmd: >-
+      vtysh -c "conf t"
+      -c "interface rt"
+      -c " ip address 172.16.200.2/24"
