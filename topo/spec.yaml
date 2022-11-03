@@ -90,8 +90,7 @@ node_configs:
 
 - name: Starlink
   cmds:
-  - cmd: tc qdisc add dev sw root netem delay 50ms
-  - cmd: tc qdisc add dev rt root netem delay 50ms
+  - cmd: tc qdisc add dev rt root netem delay 100ms
   - cmd: >-
       vtysh -c "conf t"
       -c "interface sw"
