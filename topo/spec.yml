@@ -1,34 +1,58 @@
 nodes:
-- name: Client
+- name: Client1
   image: sabaniki/frr:latest
   interfaces:
-  - { name: net0, type: direct, args: R3#net1 }
-- name: Mirror
-  image: openvswitch/ovs
+  - { name: ap, type: direct, args: AP#cl1 }
+
+nodes:
+- name: Client2
+  image: sabaniki/frr:latest
   interfaces:
-  - { name: net0, type: direct, args: R3#net0 }
-  - { name: net1, type: direct, args: R4#net0 }
-  - { name: net2, type: direct, args: C1#net0 }
-  - { name: net3, type: direct, args: C2#net0 }
+  - { name: ap, type: direct, args: AP#cl2 }
+
 - name: AP
   image: openvswitch/ovs
   interfaces:
-  - { name: net0, type: direct, args: R3#net0 }
-  - { name: net1, type: direct, args: R4#net0 }
-  - { name: net2, type: direct, args: C1#net0 }
-  - { name: net3, type: direct, args: C2#net0 }
-- name: Router
-  image: sabaniki/frr:latest
+  - { name: cl1, type: direct, args: Client1#ap }
+  - { name: cl2, type: direct, args: Client2#ap }
+  - { name: sw, type: direct, args: Switch#ap }
+
+- name: Switch
+  image: openvswitch/ovs
   interfaces:
-  - { name: net0, type: direct, args: R3#net1 }
-- name: Server
-  image: sabaniki/frr:latest
-  interfaces:
-  - { name: net0, type: direct, args: R3#net1 }
+  - { name: rtter, type: direct, args: Rtter#sw }
+  - { name: ap, type: direct, args: AP#sw }
+  - { name: cns, type: direct, args: CNS#sw }
+  - { name: st, type: direct, args: Startlink#sw }
+
 - name: RTTer
   image: sabaniki/frr:latest
   interfaces:
-  - { name: net0, type: direct, args: R3#net1 }
+  - { name: sw, type: direct, args: Switch#rtter }
+
+- name: Starlink
+  image: sabaniki/frr:latest
+  interfaces:
+  - { name: sw, type: direct, args: Switch#st }
+  - { name: rt, type: direct, args: Router#st }
+
+- name: CNS
+  image: sabaniki/frr:latest
+  interfaces:
+  - { name: sw, type: direct, args: Switch#cns }
+  - { name: rt, type: direct, args: Router#cns }
+
+- name: Router
+  image: sabaniki/frr:latest
+  interfaces:
+  - { name: st, type: direct, args: Starlink#rt }
+  - { name: cns, type: direct, args: CNS#rt }
+  - { name: sv, type: direct, args: Server#rt }
+
+- name: Server
+  image: sabaniki/frr:latest
+  interfaces:
+  - { name: rt, type: direct, args: Router#sv }
 
 node_configs:
 - name: R1
