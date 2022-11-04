@@ -25,7 +25,7 @@ nodes:
   - { name: st, type: direct, args: Starlink#sw }
 
 - name: Rtter
-  image: sabaniki/frr:latest
+  image: sabaniki/passive_rtt:latest
   interfaces:
   - { name: sw, type: direct, args: Switch#rtter }
 
@@ -142,3 +142,4 @@ node_configs:
   cmds:
   - cmd: ip addr add 172.16.0.2/24 dev rt
   - cmd: ip route add default via 172.16.0.1
+  - cmd: python3 -m http.server 80 &

@@ -7,8 +7,8 @@ use crate::packet::tuples::FiveTupleWithFlagsAndTime;
 
 // Ether のペイロードから IPv4 パケットを抽出．次のレイヤのハンドラを呼び出す
 pub fn vlan_handler(ethernet: &EthernetPacket) -> Option<FiveTupleWithFlagsAndTime> {
-    if let Some(vlan) = VlanPacket::new(ethernet.payload()) {
-        debug!("vlan id: {}", vlan.get_vlan_identifier());
+    if let Some(vlan) = VlanPacket::new(ethernet.packet()) {
+        info!("vlan id: {}", vlan.get_vlan_identifier());
         return call_ip_handler(&vlan, vlan.get_ethertype());
     }
     None

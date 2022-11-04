@@ -45,13 +45,12 @@ fn main() {
             Ok(frame) => {
                 let frame = EthernetPacket::new(frame).unwrap();
                 match frame.get_ethertype() {
-                    EtherTypes::Vlan => {
-                        handler::vlan::vlan_handler(&frame)
-                    },
                     EtherTypes::Ipv4 => {
+                        info!("got ipv4 packet");
                         handler::ip::v4_handler(&frame)
                     },
                     EtherTypes::Ipv6 => {
+                        info!("got ipv6 packet");
                         handler::ip::v6_handler(&frame)
                     },
                     _ => {
