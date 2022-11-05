@@ -1,3 +1,5 @@
+use ipnet::Ipv4Net;
+use iprange::IpRange;
 use pnet::packet::ethernet::EthernetPacket;
 use pnet::packet::ip::{IpNextHeaderProtocols, IpNextHeaderProtocol};
 use pnet::packet::ipv4::Ipv4Packet;
@@ -10,7 +12,15 @@ use crate::packet::tuples::FiveTupleWithFlagsAndTime;
 // Ether のペイロードから IPv4 パケットを抽出．次のレイヤのハンドラを呼び出す
 pub fn v4_handler(ethernet: &EthernetPacket) -> Option<FiveTupleWithFlagsAndTime> {
     if let Some(packet) = Ipv4Packet::new(ethernet.payload()) {
-        return call_transport_handler(&packet, packet.get_next_level_protocol());
+        let ip_range: IpRange<Ipv4Net> = ["192.168.100.0/24"]
+        .iter()
+        .map(|s| s.parse().unwrap())
+        .collect();
+        let src = packet.get_source();
+        let dst = packet.get_destination();
+        if ip_range.contains(&src) || ip_range.contains(&dst) {
+            return call_transport_handler(&packet, packet.get_next_level_protocol());
+        }
     }
     None
 }
@@ -18,6 +28,12 @@ pub fn v4_handler(ethernet: &EthernetPacket) -> Option<FiveTupleWithFlagsAndTime
 // Ether のペイロードから IPv4 パケットを抽出．次のレイヤのハンドラを呼び出す
 pub fn v6_handler(ethernet: &EthernetPacket) -> Option<FiveTupleWithFlagsAndTime> {
     if let Some(packet) = Ipv6Packet::new(ethernet.payload()) {
+        let ip_range: IpRange<Ipv4Net> = ["2001:db8:100:200::/64"]
+        .iter()
+        .map(|s| s.parse().unwrap())
+        .collect();
+        let src = packet.get_source();
+        let dst = packet.get_destination();
         return call_transport_handler(&packet, packet.get_next_header());
     }
     None
