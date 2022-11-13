@@ -2,7 +2,7 @@ version: '3'
 services:
   cns:
     restart: unless-stopped
-    image: orf22/passive_rtt:latest
+    build: .
     network_mode: host
     privileged: true
     # Rewite here: /passive_rtt [interface name] [CNS' ipv4 addr range(DHCP)] [CNS' ipv6 addr range(RA)]
@@ -10,7 +10,7 @@ services:
 
   starlink:
     restart: unless-stopped
-    image: orf22/passive_rtt:latest
+    build: .
     network_mode: host
     privileged: true
     # Rewite here: /passive_rtt [interface name] [Starlink's ipv4 addr range(DHCP)] [Starlink's ipv6 addr range(RA)]
