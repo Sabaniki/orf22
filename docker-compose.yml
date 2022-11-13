@@ -5,9 +5,14 @@ services:
     image: orf22/passive_rtt:latest
     network_mode: host
     privileged: true
+    # Rewite here: /passive_rtt [interface name] [CNS' ipv4 addr range(DHCP)] [CNS' ipv6 addr range(RA)]
+    entrypoint: /passive_rtt sw "192.168.100.0/24" "2001:db8:100::/64"
 
   starlink:
     restart: unless-stopped
     image: orf22/passive_rtt:latest
     network_mode: host
     privileged: true
+    # Rewite here: /passive_rtt [interface name] [Starlink's ipv4 addr range(DHCP)] [Starlink's ipv6 addr range(RA)]
+    # ※Starlink に IPv6 ないなら適当に 2001:db8::/64 とかにしておいてください
+    entrypoint: /passive_rtt sw "192.168.200.0/24" "2001:db8:200::/64"
