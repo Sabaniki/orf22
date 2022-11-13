@@ -1,0 +1,13 @@
+version: '3'
+services:
+  cns:
+    restart: unless-stopped
+    image: orf22/passive_rtt:latest
+    network_mode: host
+    privileged: true
+
+  starlink:
+    restart: unless-stopped
+    image: orf22/passive_rtt:latest
+    network_mode: host
+    privileged: true

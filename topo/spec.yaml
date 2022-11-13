@@ -25,7 +25,7 @@ nodes:
   - { name: st, type: direct, args: Starlink#sw }
 
 - name: Rtter
-  image: sabaniki/passive_rtt:latest
+  image: orf22/passive_rtt:latest
   interfaces:
   - { name: sw, type: direct, args: Switch#rtter }
 
