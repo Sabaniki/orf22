@@ -19,7 +19,7 @@ fn main() {
     env::set_var("RUST_LOG", "info");
     env_logger::init();
 
-    let interface_name = get_arg().unwrap();
+    let (interface_name, ipv4_range, ipv6_range) = get_arg().unwrap();
 
     let interface = interface::get_from_name(interface_name)
         .unwrap_or_else(|e| {
@@ -47,11 +47,11 @@ fn main() {
                 match frame.get_ethertype() {
                     EtherTypes::Ipv4 => {
                         debug!("got ipv4 packet");
-                        handler::ip::v4_handler(&frame)
+                        handler::ip::v4_handler(&frame, &ipv4_range)
                     },
                     EtherTypes::Ipv6 => {
                         debug!("got ipv6 packet");
-                        handler::ip::v6_handler(&frame)
+                        handler::ip::v6_handler(&frame, &ipv6_range)
                     },
                     _ => {
                         None
