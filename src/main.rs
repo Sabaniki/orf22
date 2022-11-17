@@ -23,7 +23,7 @@ fn main() {
 
     let (net_name, interface_name, ipv4_range, ipv6_range) = get_arg().unwrap();
 
-    let file_name = net_name + ".csv";
+    let file_name = "/csv/".to_string() + &net_name + ".csv";
 
     let interface = interface::get_from_name(interface_name)
         .unwrap_or_else(|e| {
@@ -78,7 +78,7 @@ fn main() {
                 if let Some (&target) = syn_packets.get(&received.create_key()) {
                     info!("{}", format!("[{}] -> [{}], time={:?}", received.l3_src, received.l3_dst, received.time - target));
                     // TODO: write here
-                    writeln!(file, "{}", format!("{},{},{:?}", received.l3_src, received.l3_dst, received.time - target)).expect("error while writing result.");
+                    writeln!(file, "{}", format!("{},{},{:?}", received.l3_src, received.l3_dst, (received.time - target).as_millis())).expect("error while writing result.");
                     syn_packets.remove(&received.create_key());
                     debug!("{}", format!("packets(after retain): {:?}", syn_packets));
                 }
