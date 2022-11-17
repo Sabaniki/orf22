@@ -1,35 +1,41 @@
 version: '3'
 services:
-  cns:
-    restart: unless-stopped
-    build: .
-    network_mode: host
-    privileged: true
-    # Rewite here: /passive_rtt [interface name] [CNS' ipv4 addr range(DHCP)] [CNS' ipv6 addr range(RA)]
-    entrypoint: /passive_rtt cns sw "192.168.100.0/24" "2001:db8:100::/64"
-    volumes:
-      - csv:/csv
+   cns:
+     restart: unless-stopped
+     build: .
+     network_mode: host
+     privileged: true
+     # Rewite here: /passive_rtt [interface name] [CNS' ipv4 addr range(DHCP)] [CNS' ipv6 addr range(RA)]
+     entrypoint: /passive_rtt cns ens18 "192.168.0.0/16" "2001:db8:100::/64"
+     volumes:
+       - csv:/csv
+ 
+   starlink:
+     restart: unless-stopped
+     build: .
+     network_mode: host
+     privileged: true
+     # Rewite here: /passive_rtt [interface name] [Starlink's ipv4 addr range(DHCP)] [Starlink's ipv6 addr range(RA)]
+     # ※Starlink に IPv6 ないなら適当に 2001:db8::/64 とかにしておいてください
+     entrypoint: /passive_rtt starlink ens18 "192.168.200.0/24" "2001:db8:200::/64"
+     volumes:
+       - csv:/csv
+ 
+   viewer:
+     restart: unless-stopped
+     tty: true
+     build: ./viewer/.
+     network_mode: host
+     entrypoint: python -m http.server 8080
+     volumes:
+       - csv:/csv
 
-  starlink:
-    restart: unless-stopped
-    build: .
-    network_mode: host
-    privileged: true
-    # Rewite here: /passive_rtt [interface name] [Starlink's ipv4 addr range(DHCP)] [Starlink's ipv6 addr range(RA)]
-    # ※Starlink に IPv6 ないなら適当に 2001:db8::/64 とかにしておいてください
-    entrypoint: /passive_rtt starlink sw "192.168.200.0/24" "2001:db8:200::/64"
-    volumes:
-      - csv:/csv
-
-  viewer:
-    restart: unless-stopped
-    build: ./viewer/Dockerfile
-    network_mode: host
-    privileged: true
-    entrypoint: watch ls
-    volumes:
-      - csv:/csv
+         #   imager:
+         #     restart: unless-stopped
+         #     tty: true
+         #     build: ./imager/.
+         #     volumes:
+         #       - csv:/csv
 
 volumes:
   csv:
-    external: true
