@@ -14,12 +14,16 @@ use std::process::exit;
 use pnet::datalink;
 use pnet::datalink::Channel::Ethernet;
 use pnet::packet::ethernet::{EtherTypes, EthernetPacket};
+use std::fs::File;
+use std::io::Write;
 
 fn main() {
     env::set_var("RUST_LOG", "info");
     env_logger::init();
 
-    let (interface_name, ipv4_range, ipv6_range) = get_arg().unwrap();
+    let (net_name, interface_name, ipv4_range, ipv6_range) = get_arg().unwrap();
+
+    let file_name = "/csv/".to_string() + &net_name + ".csv";
 
     let interface = interface::get_from_name(interface_name)
         .unwrap_or_else(|e| {
@@ -40,6 +44,7 @@ fn main() {
     };
 
     let mut syn_packets = HashMap::new();
+    let mut file = File::create(file_name).expect("could not create");
     loop {
         let received = match rx.next() {
             Ok(frame) => {
@@ -72,6 +77,8 @@ fn main() {
             else if ((received.tcp_flags & TcpFlags::SYN) == 0) && ((received.tcp_flags & TcpFlags::ACK) != 0) {
                 if let Some (&target) = syn_packets.get(&received.create_key()) {
                     info!("{}", format!("[{}] -> [{}], time={:?}", received.l3_src, received.l3_dst, received.time - target));
+                    // TODO: write here
+                    writeln!(file, "{}", format!("{},{},{:?}", received.l3_src, received.l3_dst, (received.time - target).as_millis())).expect("error while writing result.");
                     syn_packets.remove(&received.create_key());
                     debug!("{}", format!("packets(after retain): {:?}", syn_packets));
                 }
