@@ -1,5 +1,5 @@
 FROM python:3
 
 WORKDIR /csv
-
-ENTRYPOINT [ "watch", "ls" ]
+COPY reload.js reload.js
+COPY view.html view.html

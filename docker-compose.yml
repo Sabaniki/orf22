@@ -17,7 +17,7 @@ services:
      privileged: true
      # Rewite here: /passive_rtt [interface name] [Starlink's ipv4 addr range(DHCP)] [Starlink's ipv6 addr range(RA)]
      # ※Starlink に IPv6 ないなら適当に 2001:db8::/64 とかにしておいてください
-     entrypoint: /passive_rtt starlink ens18 "192.168.200.0/24" "2001:db8:200::/64"
+     entrypoint: /passive_rtt starlink ens18 "192.251.58.76/32" "2001:db8:200::/64" # 192.251.58.76 ← ms.gov
      volumes:
        - csv:/csv
  
@@ -26,16 +26,16 @@ services:
      tty: true
      build: ./viewer/.
      network_mode: host
-     entrypoint: python -m http.server 8080
+     entrypoint: python -m http.server 8888
      volumes:
        - csv:/csv
 
-         #   imager:
-         #     restart: unless-stopped
-         #     tty: true
-         #     build: ./imager/.
-         #     volumes:
-         #       - csv:/csv
+   imager:
+     restart: unless-stopped
+     tty: true
+     build: ./imager/.
+     volumes:
+       - csv:/csv
 
 volumes:
   csv:
