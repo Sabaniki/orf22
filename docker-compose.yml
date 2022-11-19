@@ -17,10 +17,21 @@ services:
      privileged: true
      # Rewite here: /passive_rtt [interface name] [Starlink's ipv4 addr range(DHCP)] [Starlink's ipv6 addr range(RA)]
      # ※Starlink に IPv6 ないなら適当に 2001:db8::/64 とかにしておいてください
-     entrypoint: /passive_rtt starlink ens18 "192.251.58.76/32" "2001:db8:200::/64" # 192.251.58.76 ← ms.gov
+     entrypoint: /passive_rtt starlink ens18 "192.251.58.76/32" "2001:db8:200::/64" # 192.251.58.76 ← ms.gov (for test. high latency, from japan)
      volumes:
        - csv:/csv
  
+   five-g:
+     restart: unless-stopped
+     build: .
+     network_mode: host
+     privileged: true
+     # Rewite here: /passive_rtt [interface name] [5G's ipv4 addr range(DHCP)] [5G's ipv6 addr range(RA)]
+     # ※Starlink に IPv6 ないなら適当に 2001:db8::/64 とかにしておいてください
+     entrypoint: /passive_rtt five-g ens18 "202.238.131.51/32" "2001:db8:200::/64" # 192.251.58.76 ← ms.gov (for test. medium latency, from kanagawa)
+     volumes:
+       - csv:/csv
+
    viewer:
      restart: unless-stopped
      tty: true

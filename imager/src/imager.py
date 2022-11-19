@@ -8,8 +8,8 @@ import csv
 
 
 def read_rtt(file_path):
-    # prefix = "./test/"
-    prefix = "/csv/"
+    prefix = "./test/"
+    # prefix = "/csv/"
     file_path = prefix + file_path + ".csv"
     csv_rows = []
     with open(file_path) as f:
@@ -20,29 +20,31 @@ def read_rtt(file_path):
         rtts.append(int(row[2]))
     return rtts
     
+def calc_cdf(rtts):
+    rtts = np.array(rtts)
+    rtts_count, rtts_bins_count = np.histogram(rtts, bins=rtts.size)
+    cdf = np.cumsum(rtts_count / sum(rtts_count))
+    return cdf, rtts_bins_count
     
 cns_rtts = read_rtt("cns")
 print(f"cns: {cns_rtts}")
+cns_cdf, cns_bins_count = calc_cdf(cns_rtts)
 
 starlink_rtts = read_rtt("starlink")
 print(f"starlink: {starlink_rtts}")
+starlink_cdf, starlink_bins_count = calc_cdf(starlink_rtts)
 
 
-
-cns = np.array(cns_rtts)
-starlink = np.array(starlink_rtts)
-
-cns_count, cns_bins_count = np.histogram(cns, bins=cns.size)
-starlink_count, starlink_bins_count = np.histogram(starlink, bins=starlink.size)
-
-cns_cdf = np.cumsum(cns_count / sum(cns_count))
-starlink_cdf = np.cumsum(starlink_count / sum(starlink_count))
+five_g_rtts = read_rtt("five-g")
+print(f"5G: {five_g_rtts}")
+five_g_cdf, five_g_bins_count = calc_cdf(five_g_rtts)
 
 fig = plt.figure(figsize=(6,4))
 ax = plt.subplot(111, xlabel="TCP RTT(ms)", ylabel="CDF")
 
 ax.plot(cns_bins_count[1:], cns_cdf,label="CNS")
 ax.plot(starlink_bins_count[1:], starlink_cdf,label="Starlink", linestyle="dashed")
+ax.plot(five_g_bins_count[1:], five_g_cdf,label="5G", linestyle="dashed")
 
 
 plt.legend(loc='upper left', fontsize=11.5, fancybox=False, edgecolor='black')
