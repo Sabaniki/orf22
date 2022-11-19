@@ -6,9 +6,10 @@
     - `entrypoint` と書かれている部分を編集する
         - `entrypoint: /passive_rtt [interface name] [ipv4 addr range(DHCP)] [CNS' ipv6 addr range(RA)]`
         - `[interface_name]`: さっき調べたインターフェイスの名前を書く
-        - `[ipv4 addr range(DHCP)]`: 上の CNS の部分には CNS の，下の Starlink の部分には Starlink の Wi-Fi から配られる IPv4 アドレスのレンジを書く
-        - `[ipv6 addr range(RA)]`: IPv4 同様，それぞれの Wi-Fi から配られる IPv6 アドレスのレンジを書く
-            - Starlink は IPv6 対応してないかも？ → 対応していない場合は適当なアドレスを書いておいてください．とにかくなにか書かれていないと起動しません
+        - `[ipv4 addr range(DHCP)]`: CNS/Starlin/5G のそれぞれから配られる IPv4 アドレスのレンジを書く
+        - `[ipv6 addr range(RA)]`: IPv4 同様，それぞれの RA から配られる IPv6 アドレスのレンジを書く
+            - --Starlink は IPv6 対応してないかも？ → 対応していない場合は適当なアドレスを書いておいてください．とにかくなにか書かれていないと起動しません--
+            - Starlink にも 5G にも無いらしいので適当に書いておいてください
 
 - 起動しましょう
     - `docker-compose.yml` と同じディレクトリで `docker compose up` を実行
