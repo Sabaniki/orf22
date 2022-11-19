@@ -4,7 +4,8 @@
 - docker-compose.yml を編集しましょう
     - シェルで `ip -br l` と実行し，ミラートラフィックを受信しているインターフェイスの名前を調べる
     - `entrypoint` と書かれている部分を編集する
-        - `entrypoint: /passive_rtt [interface name] [ipv4 addr range(DHCP)] [CNS' ipv6 addr range(RA)]`
+        - `entrypoint: /passive_rtt [net name] [interface name] [ipv4 addr range(DHCP)] [CNS' ipv6 addr range(RA)]`
+        - `[net name]`: ネットワークの名前を書く(既に docker-compose.yml に書いている内容から変えなくて良い)
         - `[interface_name]`: さっき調べたインターフェイスの名前を書く
         - `[ipv4 addr range(DHCP)]`: CNS/Starlin/5G のそれぞれから配られる IPv4 アドレスのレンジを書く
         - `[ipv6 addr range(RA)]`: IPv4 同様，それぞれの RA から配られる IPv6 アドレスのレンジを書く
