@@ -8,8 +8,8 @@ import csv
 
 
 def read_rtt(file_path):
-    prefix = "./test/"
-    # prefix = "/csv/"
+    # prefix = "./test/"
+    prefix = "/csv/"
     file_path = prefix + file_path + ".csv"
     csv_rows = []
     with open(file_path) as f:
